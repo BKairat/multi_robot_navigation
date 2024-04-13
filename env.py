@@ -8,7 +8,7 @@ from shapely.geometry import Point, LineString, Polygon
 from shapely.ops import split
 from robots import CarLikeBot, CircleRobot
 import json
-from history import History
+from history import History, MyHistory
 # import copy
 
 def sigmoid(x):
@@ -94,6 +94,7 @@ class Environment:
         self.addObstacles()
         self.addAgents()
         self.addGoals()
+        self.get_observation()
         self.disc_act = {
             0: (0, 0.5),        # 0
             1: (1, 0.5),        # 0
@@ -152,22 +153,28 @@ class Environment:
                 if ag != agent:
                     obj.append(ag.get_())
             
+            # obs = {
+            #     #  lasers
+            #     "ol": np.linalg.norm(np.array(ray_cast(agent, obj)) - agent.laser_position(), axis=1),
+            #     #  relative orientation to the goal as dir vector
+            #     "og": (self.goals[agent] - agent.position)/np.linalg.norm(self.goals[agent] - agent.position),
+            #     #  linear and angular velocity 
+            #     "ov": agent.velocity,
+            #     #  euclidian dstance to goal.
+            #     "od": np.reshape(np.linalg.norm(agent.position-self.goals[agent]), (1))
+            # }
             obs = {
                 #  lasers
                 "ol": np.linalg.norm(np.array(ray_cast(agent, obj)) - agent.laser_position(), axis=1),
-                #  relative orientation to the goal as dir vector
-                "og": (self.goals[agent] - agent.position)/np.linalg.norm(self.goals[agent] - agent.position),
-                #  linear and angular velocity 
-                "ov": agent.velocity,
-                #  euclidian dstance to goal.
-                "od": np.reshape(np.linalg.norm(agent.position-self.goals[agent]), (1))
+                # 
+                "op": np.concatenate((self.goals[agent] - agent.position, np.array([agent.orientation])))
             }
             
             if agent.history:
                 agent.history.add(obs)
             else:
-                agent.history = History(obs)
-            ret.append(History(obs))
+                agent.history = MyHistory(obs)
+            ret.append(MyHistory(obs))
 
         return ret[0].get_vectors()
     
@@ -178,6 +185,9 @@ class Environment:
             else:
                 actions = np.array([self.disc_act[a.item()] for a in actions])
         else:
+            # print("env", actions.shape)
+            if len(actions.shape) == (1, 2):
+                actions = actions.reshape(2)
             actions = sigmoid(actions)
         r = []
         done = False
@@ -202,6 +212,8 @@ class Environment:
                 cnt += 1
         if cnt >= len(self.agents):
             done = True
+        
+        self.get_observation()
         
         if self.reward:
             for ag in self.agents:
@@ -249,5 +261,6 @@ class Environment:
         self.addObstacles()
         self.addAgents()
         self.addGoals()
+        self.get_observation()
         return
                     

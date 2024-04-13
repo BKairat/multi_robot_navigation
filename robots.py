@@ -17,7 +17,7 @@ class CircleRobot:
     collision_a = False
     reached = False
     v_limit = 5
-    w_limit = np.pi/12
+    w_limit = np.pi/24
 
     def __init__(
         self,

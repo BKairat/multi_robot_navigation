@@ -15,16 +15,7 @@ class History:
             "d_0": first["od"]
         }
         
-    def add(self, observation: dict):
-        # del self.data["ol"][0]
-        # del self.data["og"][0]
-        # del self.data["ov"][0]
-        # del self.data["od"][0]
-        # self.data["ol"].append(observation["ol"])
-        # self.data["og"].append(observation["og"])
-        # self.data["ov"].append(observation["ov"])
-        # self.data["od"].append(observation["od"])
-        
+    def add(self, observation: dict):        
         self.data["ol"].pop(0)
         self.data["og"].pop(0)
         self.data["ov"].pop(0)
@@ -67,4 +58,42 @@ class History:
         return f"====\nod: {data['od']}"
     # ol: {data['ol'][:3]}...{data['ol'][-3:]} \nog: {data['og']}\nov: {data['ov']}\n
     
-             
+class MyHistory:
+    def __init__(self, first: dict, lenght: int = 4):
+        self.lenght = lenght
+        self.data = {
+            #  lasers
+            "ol": [first["ol"] for _ in range(lenght)],
+            #  robot possition and orientation relative to goal
+            "op": [first["op"]],
+        }
+        
+    def add(self, observation: dict):        
+        self.data["ol"].pop(0)
+        
+        self.data["ol"].append(observation["ol"])
+        self.data["op"].append(observation["op"])
+    
+    def item(self, i: str):
+        return self.data[i]
+    
+    def get(self):
+        return {
+            #  lasers
+            "ol": np.array(self.data["ol"][-1]),
+            #  position and orientation
+            "op": self.data["op"]
+        }
+        
+    def __len__(self):
+        return self.lenght
+    
+    def get_vectors(self):
+        # print(self.data["op"])
+        return (np.array(self.data["ol"]),
+                np.array(self.data["op"][-1]))
+        
+    def __str__(self):
+        data = self.get()
+        return f"====\nol: {data['ol']}\nod: {data['od']}"
+    

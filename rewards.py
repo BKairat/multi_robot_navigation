@@ -25,6 +25,7 @@ class RewardCircle():
         self.r_col      =   60
         
     def reward(self, agent, goal):
+        # return 0
         history = agent.history.get()
         # collision (world, agent), d_0, r_collision, l_laser
         if history["od"][-1] < self.threshold:
@@ -55,11 +56,31 @@ class RewardCircle():
             r_mld = 0
         
         penalty = 0
-        if np.abs(history["od"][-1] - history["od"][-2]) < 0.2:
-            penalty = -0.01
+        if np.abs(history["ov"][-2]) < 0.001:
+            penalty = -0.0001
+        
         # r_wig
-        # r_wig = self.w_neg/T
         r_wig = 0 
         return r_dist+r_ori+r_st+r_mld+r_wig+penalty
 
+
+class MyReward:
+    def __init__(self):
+        self.goal_reward = 10
+        self.reach_reward = 100
+        self.penalty = -10
     
+         
+    def reward(self, agent, goal):
+        his = agent.history.get()
+        op= his["op"]
+        ol= his["ol"]
+        # print(np.linalg.norm(op[:2]))
+        prev = np.linalg.norm(op[-2][:-1])
+        cur = np.linalg.norm(op[-1][:-1])
+        if min(ol) < 50:
+            return self.penalty / (min(ol)/50)
+        return (self.goal_reward)*((prev-cur)/agent.v_limit)
+        # if min()
+        # raise
+        return 0

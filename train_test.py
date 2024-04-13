@@ -4,34 +4,35 @@ import pygame as pg
 from robots import CarLikeBot, CircleRobot
 from random import uniform
 from env import Environment
-from policies import ContiniousPolicy, DiscterePolicy
-from rewards import RewardCircle
+from policies import ContiniousPolicy, DiscterePolicy, ContiniousPolicy001
+from rewards import RewardCircle, MyReward
 import time
 import torch
-from train import PPO
+from train import PPO, MyPPO
 
-disc = True
-maps_ = [4,5,6,7]
+disc = 0
+maps_ = [8, 9]
 
-env = Environment(CircleRobot, int(np.random.choice(maps_)), reward=RewardCircle(), discrete=disc)
+env = Environment(CircleRobot, int(np.random.choice(maps_)), reward=MyReward(), discrete=disc)
 if disc:
     p = DiscterePolicy()
     p.load_state_dict(torch.load('model_disc.pth'))
 else: 
-    p = ContiniousPolicy()
-    p.load_state_dict(torch.load('pretrained_models/model_with_one_tanh.pth'))
+    p = ContiniousPolicy001()
+    # p.load_state_dict(torch.load('pretrained_models/model_with_one_tanh.pth'))
     
-PPO(
+MyPPO(
     env,
     p,
     path = None,
-    max_steps = 128,
-    epochs = 15_001,
+    max_steps = 100,
+    epochs = 10_001,
     lr = 0.0003,
     gamma=0.95,
     epsilon = 0.2,
-    sgd_iters = 8,
+    sgd_iters = 4,
     maps = maps_,
     test_feq = 5_00,
-    test_num = 25
+    test_num = 25,
+    model_name = "my_model"
     )
