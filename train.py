@@ -294,7 +294,7 @@ def MyPPO(
         ):
         if path:
                 pi.load_state_dict(torch.load(path))
-        optim = torch.optim.SGD(pi.parameters(), lr=lr)
+        optim = torch.optim.Adam(pi.parameters(), lr=lr)
 
         for epoch in tqdm(range(epochs)):
                 ol, op, actions, rewards = my_sample_trajectories(train_env, pi, max_steps, int(np.random.choice(maps)))
@@ -344,7 +344,7 @@ def MyPPO(
                                 L_ppo = ppo_loss(p_ratios, advantage_estimates[i], epsilon=epsilon)
                                 total_loss.append(L_v + L_ppo)
                         
-                        total_sum_tensor = torch.sum(torch.stack(total_loss), dim=0)/len(total_loss)
+                        total_sum_tensor = -torch.sum(torch.stack(total_loss), dim=0)/len(total_loss)
                         optim.zero_grad()
                         total_sum_tensor.backward()
                         optim.step()

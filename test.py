@@ -4,15 +4,16 @@ import pygame as pg
 from robots import CarLikeBot, CircleRobot
 from random import uniform
 from env import Environment
-from policies import ContiniousPolicy, DiscterePolicy, ContiniousPolicy001
+from policies import ContiniousPolicy, DiscterePolicy, ContiniousPolicy001, DiscterePolicy001
 from rewards import RewardCircle, MyReward
 import time
 import torch
 import matplotlib.pyplot as plt
 
-disc = False
-maps_ = [8]
-pretrained = None
+disc = 1
+maps_ = [8, 9]
+pretrained = ""
+"my_model_final.pth"
 my = True
 
 
@@ -25,7 +26,7 @@ env.surface = surface
 env.font = font
 
 if disc:
-    p = DiscterePolicy()
+    p = DiscterePolicy001()
     if pretrained:
         p.load_state_dict(torch.load(pretrained))
 else:
@@ -76,6 +77,7 @@ while running:
 
     actions = p.sample_actions(ol, op)
     
+    # print(actions)
     r, done = env.step(actions)
     for r_i in range(len(r)):
         rew[r_i].append(r[r_i])

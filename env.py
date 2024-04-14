@@ -188,6 +188,7 @@ class Environment:
             # print("env", actions.shape)
             if len(actions.shape) == (1, 2):
                 actions = actions.reshape(2)
+            actions = actions.detach().numpy()
             actions = sigmoid(actions)
         r = []
         done = False
