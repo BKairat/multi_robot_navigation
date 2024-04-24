@@ -165,7 +165,7 @@ class Environment:
             # }
             obs = {
                 #  lasers
-                "ol": np.linalg.norm(np.array(ray_cast(agent, obj)) - agent.laser_position(), axis=1),
+                "ol": np.linalg.norm(np.array(ray_cast(agent, obj)) - agent.laser_position(), axis=1) / agent.laser_lenght,
                 # 
                 "op": np.concatenate((self.goals[agent] - agent.position, np.array([agent.orientation])))
             }
@@ -185,11 +185,12 @@ class Environment:
             else:
                 actions = np.array([self.disc_act[a.item()] for a in actions])
         else:
-            # print("env", actions.shape)
+            # print("env", type(actions))
             if len(actions.shape) == (1, 2):
                 actions = actions.reshape(2)
-            actions = actions.detach().numpy()
+            # actions = actions.detach().numpy()
             actions = sigmoid(actions)
+            # print(actions)
         r = []
         done = False
         cnt = 0
@@ -251,7 +252,7 @@ class Environment:
                     if ag != agent:
                         obj.append(ag.get_())
                 for o in ray_cast(agent, obj):
-                    pg.draw.circle(self.surface, agent.color, o, 2)
+                    pg.draw.circle(self.surface, agent.color, o, 5)
         
     def reset(self, map_: int):
         del self.agents

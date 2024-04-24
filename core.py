@@ -42,3 +42,7 @@ def unit_vector(vector):
 def angle_vector(vector1):
     unit_vec = unit_vector(vector1)
     return np.arctan2(unit_vec[0], unit_vec[1])
+
+def normalize_angle(angle):
+    normalized_angle = np.mod(angle + np.pi, 2 * np.pi) - np.pi
+    return normalized_angle

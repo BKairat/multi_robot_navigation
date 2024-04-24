@@ -66,21 +66,40 @@ class RewardCircle():
 
 class MyReward:
     def __init__(self):
-        self.goal_reward = 10
-        self.reach_reward = 100
-        self.penalty = -10
+        self.goal_reward = 1
+        self.reach_reward = 10
+        self.penalty = 1
+        self.history = {}
     
          
     def reward(self, agent, goal):
-        his = agent.history.get()
-        op= his["op"]
-        ol= his["ol"]
-        # print(np.linalg.norm(op[:2]))
-        prev = np.linalg.norm(op[-2][:-1])
-        cur = np.linalg.norm(op[-1][:-1])
-        if min(ol) < 50:
-            return self.penalty / (min(ol)/50)
-        return (self.goal_reward)*((prev-cur)/agent.v_limit)
-        # if min()
-        # raise
-        return 0
+        his = agent.history
+        op= his[16*4:]
+        ol= his[:16*4]
+        rew = 0
+        r_dist, p_zone, p_col, rew = 0, 0, 0, 0
+
+        if agent not in self.history:
+            self.history[agent] = np.linalg.norm(goal-agent.position)
+            r_dist = 0
+        else:
+            r_dist = self.goal_reward*(self.history[agent] - np.linalg.norm(goal-agent.position))/agent.v_limit
+            self.history[agent] = np.linalg.norm(goal-agent.position)
+        
+        if min(ol[-16:]) * agent.laser_lenght < agent.save_zone:
+            p_zone = self.penalty*((min(ol[-16:]) * agent.laser_lenght - agent.save_zone)/agent.save_zone)
+        else:
+            p_zone = 0
+            
+        if agent.collision_w or agent.collision_a:
+            p_col = -1
+        else:
+            p_col = 0
+            
+        if agent.reached:
+            rew = 2
+        else:
+            rew = 0
+            
+        return r_dist + p_zone + p_col + rew
+    

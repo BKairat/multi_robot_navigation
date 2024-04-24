@@ -8,7 +8,7 @@ from history import History
 class CircleRobot:
     # 5 pix = 100 mm 
     radius = 30
-    
+    save_zone = 40
     laser_lenght = 500
     laser_range = np.pi
     lasers = 16 # 1080
@@ -33,15 +33,19 @@ class CircleRobot:
         self.color = tuple(np.random.rand(3) * 250)
         self.index = index
         self.history = history
+        self.path = [np.array(self.position)]
 
     def act(self):
         if not self.collision_w and not self.collision_a:
             v = (self.velocity[0] + 1) * 0.5 * self.v_limit
             w = (self.velocity[1] - 0.5) * 2 * self.w_limit
+            # print(w)
 
-            self.orientation += w
+            self.orientation = core.normalize_angle(self.orientation + w)
+            
             delta = core.rotation(np.array([0, v])+self.position, self.orientation, self.position)
             self.position = delta
+        self.path.append(np.array(self.position))
     
     def draw(self, surface: pg.surface.Surface, font: pg.font.Font, text_ = None) -> None:
         axis = core.rotation(np.array([0, self.radius*1.6])+self.position, self.orientation, self.position)
@@ -68,7 +72,7 @@ class CarLikeBot:
     # 5 pix = 100 mm 
     W = 93          
     L = 159
-    
+    save_zone = 93
     laser_lenght = 500
     laser_range = np.pi
     lasers = 16 # 1080
@@ -77,7 +81,7 @@ class CarLikeBot:
     collision_a = False
     reached = False
     v_limit = 20
-    w_limit = np.pi/12
+    w_limit = np.pi/6
     
     def __init__(
         self,
@@ -93,6 +97,7 @@ class CarLikeBot:
         self.color = tuple(np.random.rand(3) * 250)
         self.index = index
         self.history = history
+        self.path = [np.array(self.position)]
         
     def act(self) -> None:
         if not self.collision_w and not self.collision_a:
@@ -104,6 +109,7 @@ class CarLikeBot:
                 v*np.cos(self.orientation)
             ])
             self.orientation += (v/self.L) * np.tan(w)
+        self.path.append(np.array(self.position))
 
     def draw(self, surface: pg.surface.Surface, font: pg.font.Font, text: str|None = None):
         lenght = self.L + 0.4*self.L
