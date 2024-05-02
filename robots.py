@@ -17,7 +17,7 @@ class CircleRobot:
     collision_a = False
     reached = False
     v_limit = 5
-    w_limit = np.pi/24
+    w_limit = np.pi/6 #24
 
     def __init__(
         self,
@@ -80,7 +80,7 @@ class CarLikeBot:
     collision_w = False
     collision_a = False
     reached = False
-    v_limit = 20
+    v_limit = 10
     w_limit = np.pi/6
     
     def __init__(

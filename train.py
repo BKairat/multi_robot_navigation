@@ -651,7 +651,7 @@ class PPO_gym:
                                 
                         if epoch % 20 == 0:
                                 print('Epoch %d, mean reward: %.3f, value loss: %.3f, ppo_loss: %.6f' % (epoch, tensor_r.mean(), L_v.item(), L_ppo.item()))
-                                torch.save(pi.state_dict(), f'cirkle_gym/model_{epoch}.pth')
+                                torch.save(pi.state_dict(), f'carlike_gym/model_{epoch}.pth')
                         mean_rewards[epoch] = tensor_r.mean()
                         v_losses[epoch] = L_v.item()
                         p_losses[epoch] = L_ppo.item()
@@ -660,7 +660,7 @@ class PPO_gym:
                 
         def sample_trajectories(self):
                 sl, al, rl = [], [], []
-                for _ in range(30):
+                for _ in range(20):
                         states = np.zeros((self.max_steps + 1, len(self.train_env.agents), self.train_env.state_len), dtype=float)
                         actions = np.zeros((self.max_steps, len(self.train_env.agents)), dtype=float)
                         rewards = np.zeros((self.max_steps, len(self.train_env.agents)), dtype=float)
@@ -717,11 +717,11 @@ class PPO_gym:
                 return discounted_sum
 
 if __name__ == "__main__":
-        env = Environment(CircleRobot, map=[8, 9], reward=MyReward())
+        env = Environment(CarLikeBot, map=[4,5,6,7], reward=MyReward())
         observation_space = gym.spaces.Box(low=np.zeros(16*4+3), high=np.ones(16*4+3))
 
         pi = CustomPolicy(observation_space)
-        pi.load_state_dict(torch.load("gym_models/model_1300.pth"))
+        # pi.load_state_dict(torch.load("carlike_gym/model_0.pth"))
         ppo = PPO_gym(env, pi, max_steps=126, n_epochs=1000)
         ppo.tarin()
                 
