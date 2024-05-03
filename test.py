@@ -14,8 +14,8 @@ import torch
 import matplotlib.pyplot as plt
 
 disc = 0
-maps_ = [48,49,50,51,52]
-pretrained = "gym_models/model_1300.pth"
+maps_ = [4,5,6,7]
+pretrained = "carlike_gym/model_520.pth"
 "carlike_gym/model_0.pth"
 "circle_gym/model_140.pth"
 "gym_models/model_1300.pth"
@@ -25,7 +25,7 @@ pretrained = "gym_models/model_1300.pth"
 "my_model_final.pth"
 my = True
 # CircleRobot  CarLikeBot
-env = Environment(CircleRobot, map=maps_, reward=MyReward())
+env = Environment(CarLikeBot, map=maps_, reward=MyReward())
 observation_space = gym.spaces.Box(low=np.zeros(16*4+3), high=np.ones(16*4+3))
 
 pi = CustomPolicy(observation_space)
@@ -62,7 +62,7 @@ while running:
     env.render()
     pg.display.flip()
 
-    if a >= 512 or done.all():
+    if a >= 126 or done.all():
         s = env.reset()
         a = 0
     else:

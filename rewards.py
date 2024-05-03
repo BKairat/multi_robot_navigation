@@ -102,4 +102,46 @@ class MyReward:
             rew = 0
             
         return r_dist + p_zone + p_col + rew
-    
+ 
+class MyReward2:
+     def __init__(self):
+         self.goal_dir_rew   = 1
+         self.goal_reach_rew = 2
+         self.staying_pen    = -0.02
+         self.dist_goal_rew  = 1
+         self.lasers_penalty = -0.01
+         self.collision_ag   = -0.3
+         self.collision_wo   = -0.2
+         self.history        = {}
+
+     def reward(self, agent, goal):
+         his = agent.history
+         op = his[16*4:]
+         ol = his[:16*4]
+
+         if agent.reached:
+             return self.goal_reach_rew
+
+         if agent.collision_w:
+             return self.collision_wo
+         elif agent.collision_a:
+             return self.collision_ag
+
+         rew = 0
+         if agent not in self.history:
+             self.history[agent] = np.linalg.norm(goal-agent.position)
+             return 0
+
+         rew += self.goal_dir_rew*(self.history[agent] - np.linalg.norm(goal-agent.position))/agent.v_limit
+         self.history[agent] = np.linalg.norm(goal-agent.position)
+        
+         if np.abs(rew) <= 0.01:
+             rew += self.staying_pen
+
+         if min(ol[-16:]) * agent.laser_lenght < agent.save_zone:
+            rew += self.lasers_penalty*((min(ol[-16:]) * agent.laser_lenght - agent.save_zone)/agent.save_zone)
+
+         
+         
+
+         return rew

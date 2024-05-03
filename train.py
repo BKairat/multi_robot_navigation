@@ -3,9 +3,9 @@ import numpy as np
 from robots import CarLikeBot, CircleRobot
 # from random import uniform
 from gym_env import Environment
-from policies import CustomPolicy 
+from policies import CustomPolicy, CustomPolicyLessOl 
 # from algo.ppo import PPO
-from rewards import RewardCircle, MyReward
+from rewards import RewardCircle, MyReward, MyReward2
 import gym
 import matplotlib.pyplot as plt
 import torch
@@ -651,7 +651,7 @@ class PPO_gym:
                                 
                         if epoch % 20 == 0:
                                 print('Epoch %d, mean reward: %.3f, value loss: %.3f, ppo_loss: %.6f' % (epoch, tensor_r.mean(), L_v.item(), L_ppo.item()))
-                                torch.save(pi.state_dict(), f'carlike_gym/model_{epoch}.pth')
+                                torch.save(pi.state_dict(), f'carlike_lessOl/model_{epoch}.pth')
                         mean_rewards[epoch] = tensor_r.mean()
                         v_losses[epoch] = L_v.item()
                         p_losses[epoch] = L_ppo.item()
@@ -694,34 +694,23 @@ class PPO_gym:
                 return -torch.mean(-log_prob)
         
         def compute_gae(self, tensor_r, values, gamma, lambda_):
-                # print("delta_t", tensor_r.shape, values.shape)
                 delta_t = tensor_r + gamma * values[:, 1:] - values[:, :-1]
-                # print("delta_t", tensor_r.shape, delta_t.shape, values.shape)
                 advantages = self.discount_sum(delta_t, gamma * lambda_)
-                # print("compute_gae adv", advantages.shape)
-                # print("compute_gae values", values.shape)
-                # print("compute_gae values", values[:, :-1].shape)
                 value_targets = advantages + values[:, :-1]
-                # print("compute_gae value_targets", value_targets.shape)
-                # print("compute_gae value_targets -dim", value_targets.squeeze(dim=-1).shape)
                 return value_targets.squeeze(dim=-1), advantages
 
         def discount_sum(self, rewards, gamma):
-                # print("=================== disc _ sum ===================")
-                
                 discounted_sum = 0
                 for t in reversed(range(len(rewards))):
                         discounted_sum = rewards[t] + gamma * discounted_sum
-                # print(rewards.shape, discounted_sum.shape)
-                # print("==================================================")
                 return discounted_sum
 
 if __name__ == "__main__":
-        env = Environment(CarLikeBot, map=[4,5,6,7], reward=MyReward())
+        env = Environment(CarLikeBot, map=[4,5,6,7], reward=MyReward2())
         observation_space = gym.spaces.Box(low=np.zeros(16*4+3), high=np.ones(16*4+3))
 
-        pi = CustomPolicy(observation_space)
-        # pi.load_state_dict(torch.load("carlike_gym/model_0.pth"))
+        pi = CustomPolicyLessOl(observation_space)
+        # pi.load_state_dict(torch.load("carlike_gym/model_100.pth"))
         ppo = PPO_gym(env, pi, max_steps=126, n_epochs=1000)
         ppo.tarin()
                 
