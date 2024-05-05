@@ -65,7 +65,7 @@ else:
     raise Exception("policy must contain std or less")
 
 if args.pretrained and  args.pretrained != "None": 
-    pi.load_state_dict(torch.load(pretrained))
+    pi.load_state_dict(torch.load(args.pretrained))
 
 pg.init()
 h, w = env.shape
