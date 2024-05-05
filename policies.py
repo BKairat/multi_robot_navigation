@@ -31,7 +31,6 @@ class CustomCNN(BaseFeaturesExtractor):
         # Process other observations through fully connected layers
         op = observations[:, 16*4:]  # Assuming the 5th observation is for od
         op = F.relu(self.fc_op(op))
-        print(f"ol: {ol.shape}, op: {op.shape}")
         # Merge all features
         merged = torch.cat((ol, op), dim=1)
         
