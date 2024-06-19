@@ -23,6 +23,7 @@ parser.add_argument("maps", type=list_of_ints)
 parser.add_argument("policy")
 parser.add_argument("pretrained")
 parser.add_argument("reward", type=int)
+parser.add_argument("steps", type=int)
 
 args = parser.parse_args()
 
@@ -52,8 +53,8 @@ if args.reward == 0:
 elif args.reward == 1:
     rew = MyReward2()
 
-#CircleRobot  CarLikeBot
-env = Environment(agent, map=maps_, reward=MyReward())
+#CircleRobiot  CarLikeBot
+env = Environment(agent, map=maps_, reward=rew, observation_=True)
 observation_space = gym.spaces.Box(low=np.zeros(16*4+3), high=np.ones(16*4+3))
 
 pi = None
@@ -86,19 +87,21 @@ while running:
     for event in pg.event.get():
         if event.type == pg.QUIT:
             running = False
-
+    # print("agents", len(env.agents))
     actions = pi.sample_actions(torch.tensor(s).float())
+    #print(actions)
     print(actions)
-
     s, r, done, _ = env.step(np.array(actions))
+    #s, r, done, _ = env.step(np.zeros(len(env.agents)))
     for r_i in range(len(r)):
-        rew[r_i].append(r[r_i])
+       rew[r_i].append(r[r_i])
         
     env.render()
     pg.display.flip()
 
-    if a >= 126 or done.all():
+    if a >= args.steps:
         s = env.reset()
+        #print(a)
         a = 0
     else:
         a += 1
@@ -107,8 +110,8 @@ while running:
 
 pg.quit()
 for i, re in enumerate(rew):
-     x = np.arange(len(re))
-     plt.plot(x, re, color=env.agents[i].color/max(env.agents[i].color), label=f'robot index {i}')
+    x = np.arange(len(re))
+    plt.plot(x, re, color=env.agents[i].color/max(env.agents[i].color), label=f'robot index {i}')
 
 plt.legend()
 plt.show()

@@ -51,7 +51,7 @@ class PPO_gym:
                 optim = torch.optim.Adam(self.policy.parameters(), lr=self.lr)
 
                 mean_rewards, p_losses, v_losses = np.zeros(self.n_epochs), np.zeros(self.n_epochs), np.zeros(self.n_epochs)  # for logging mean rewards over epochs
-                for epoch in range(self.n_epochs):
+                for epoch in tqdm(range(self.n_epochs)):
                         tensor_s, tensor_a, tensor_r = self.sample_trajectories()  # collect trajectories using current policy
                         tensor_r = tensor_r.transpose(0,1)
                         # print(tensor_s.shape, tensor_a.shape, tensor_r.shape)
@@ -91,7 +91,7 @@ class PPO_gym:
                         p_losses[epoch] = L_ppo.item()
                         
                 # loss = policy_loss + self.ent_coef * entropy_loss + self.vf_coef * value_loss
-                
+        
         def sample_trajectories(self):
                 sl, al, rl = [], [], []
                 for _ in range(20):
@@ -186,8 +186,10 @@ if __name__ == "__main__":
     
     if args.pretrained and  args.pretrained != "None":
         pi.load_state_dict(torch.load(args.pretrained))
-
-    folder_path = f"{ag_t}_{pi_t}_{args.epochs}_{args.reward}"
+    maps_str = ""
+    for m in args.maps:
+        maps_str += str(m)
+    folder_path = f"{ag_t}_{pi_t}_{maps_str}_{args.steps}_{args.epochs}_{args.reward}"
     os.makedirs(folder_path, exist_ok=True)
 
     ppo = PPO_gym(

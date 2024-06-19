@@ -112,6 +112,11 @@ class CustomPolicy(nn.Module):
         actions = action_dist.sample()
         return actions
 
+    def actions(self, observations: torch.Tensor):
+        features = self.features_extractor(observations)
+        action_probs = F.softmax(self.actor(features), dim=-1)
+        return torch.argmax(action_probs, dim=0)
+
 class CustomPolicyLessOl(nn.Module):
     def __init__(self, observation_space: gym.spaces.Box):
         super(CustomPolicyLessOl, self).__init__()
@@ -162,6 +167,11 @@ class CustomPolicyLessOl(nn.Module):
         action_dist = Categorical(action_probs)
         actions = action_dist.sample()
         return actions
+
+    def actions(self, observations: torch.Tensor):
+        features = self.featutes_extractor(observation)
+        action_probs = F.softmax(self.actor(features), dim=-1)
+        return torch.argmax(action_probs, dom=0)
 
 if __name__ == "__main__":
     observation_space = gym.spaces.Box(low=np.zeros(16*4+3), high=np.ones(16*4+3))

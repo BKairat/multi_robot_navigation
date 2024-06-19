@@ -135,9 +135,9 @@ class Environment(gym.Env):
     
     def addAgents(self):
         self.agents = []
-        thresh_red = cv2.inRange(self.map_bgr, np.array([0,0,255]), np.array([0,0,255]))
+        thresh_red = cv2.inRange(self.map_bgr, np.array([0,0,230]), np.array([40,55,255]))
         contours_red, _  = cv2.findContours(thresh_red.copy(), cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-        thresh_blue = cv2.inRange(self.map_bgr, np.array([255,0,0]), np.array([255,0,0]))
+        thresh_blue = cv2.inRange(self.map_bgr, np.array([230,0,0]), np.array([255,0,0]))
         contours_blue, _  = cv2.findContours(thresh_blue.copy(), cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
         assert len(contours_red) == len(contours_blue), "Map must contain same amount of red contours as bule ones"
         red_centers = [np.mean(c[0], axis=0) for c in contours_red]
@@ -149,21 +149,23 @@ class Environment(gym.Env):
             self.agents.append(self.agent_type(
                 position = rb[0] + np.random.randn(2),
                 orientation = orient + np.random.uniform(-np.pi/12, np.pi/12),
-                velocity=np.array([0.0, 0.0]),
+                velocity=np.array([0.0, 0.5]),
                 index=i,
                 ))
     
     def addGoals(self):
         self.goals = {}
-        THRESH = cv2.inRange(self.map_bgr, np.array([0,255,0]), np.array([0,255,0]))
+        THRESH = cv2.inRange(self.map_bgr, np.array([0,240,0]), np.array([0,255,0]))
         CONTOURS, _  = cv2.findContours(THRESH.copy(), cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
         order = [i for i in range(len(CONTOURS))]
-        np.random.shuffle(self.agents)
+        #np.random.shuffle(self.agents)
         for index, contour in enumerate(CONTOURS):
             self.goals[self.agents[len(self.agents)-index-1]] = np.mean(np.reshape(contour, (contour.shape[0], 2)), axis=0)
-        
+            # self.goals[self.agents[len(self.agents)-index-1]] = np.zeros(2)
+            
     def get_observation(self) -> [np.ndarray]:
         ret = []
+    
         for agent in self.agents:
             
             obj = self.obstalces.copy()

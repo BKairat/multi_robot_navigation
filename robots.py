@@ -144,8 +144,9 @@ class CarLikeBot:
         pg.draw.polygon(surface, (0, 0, 0), weel_2,  width=0)
         pg.draw.polygon(surface, (0, 0, 0), weel_3,  width=0)
         pg.draw.polygon(surface, (0, 0, 0), weel_4,  width=0)
+        # "%.3f, %.3f" % (self.velocity[0] * self.v_limit, (self.velocity[1] - 0.5) * 2 * self.w_limit)
         text = font.render(
-            "%.3f, %.3f" % (self.velocity[0] * self.v_limit, (self.velocity[1] - 0.5) * 2 * self.w_limit) if not text else text,
+            str(self.index) if not text else text,
             True,
             (0, 0, 0)
         )
