@@ -149,10 +149,10 @@ if __name__ == "__main__":
     parser.add_argument("maps", type=list_of_ints)
     parser.add_argument("policy")
     parser.add_argument("pretrained")
-    parser.add_argument("reward", type=int)
-    parser.add_argument("steps", type=int)
-    parser.add_argument("epochs", type=int)
-    parser.add_argument("freq", type=int)
+    parser.add_argument("reward", type=int, default=0)
+    parser.add_argument("steps", type=int, default=256)
+    parser.add_argument("epochs", type=int, default=5000)
+    parser.add_argument("freq", type=int, default=250)
 
     args = parser.parse_args()
 
